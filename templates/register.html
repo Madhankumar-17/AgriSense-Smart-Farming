@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | AgriSense AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand-icon">🌿</span>
+        <span>AgriSense</span>
+    </a>
+
+    <nav class="navigation">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('login') }}">Login</a>
+    </nav>
+</header>
+
+<main class="page-container">
+    <section class="auth-layout">
+
+        <aside class="auth-showcase">
+            <div>
+                <p class="eyebrow">GROW WITH CONFIDENCE</p>
+                <h1>Make every farming decision more informed.</h1>
+                <p>
+                    Create your AgriSense account to save
+                    predictions, revisit results, and organize
+                    your crop insights.
+                </p>
+
+                <div class="auth-benefits">
+                    <p>✓ Save your prediction history</p>
+                    <p>✓ Access your personal profile</p>
+                    <p>✓ Continue beyond guest predictions</p>
+                </div>
+            </div>
+
+            <div class="auth-art" aria-hidden="true">🌿 🌱 🌾</div>
+        </aside>
+
+        <div class="auth-panel-wrap">
+            <section class="auth-panel">
+                <p class="eyebrow">JOIN AGRISENSE</p>
+                <h2>Create your account</h2>
+                <p class="auth-subtitle">
+                    It takes just a moment to get started.
+                </p>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages">
+                            {% for category, message in messages %}
+                                <div class="flash-message {{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <form class="auth-form" method="POST"
+                      action="{{ url_for('register') }}">
+
+                    <div class="form-field">
+                        <label for="name">Full name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Enter your name"
+                            autocomplete="name"
+                            maxlength="100"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-field">
+                        <label for="email">Email address</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="you@example.com"
+                            autocomplete="email"
+                            maxlength="254"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-field">
+                        <label for="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="At least 8 characters"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+                        <p class="password-hint">
+                            Use at least 8 characters.
+                        </p>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="confirm_password">
+                            Confirm password
+                        </label>
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="confirm_password"
+                            placeholder="Enter your password again"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+                    </div>
+
+                    <button class="primary-button" type="submit">
+                        Create Account →
+                    </button>
+                </form>
+
+                <p class="auth-switch">
+                    Already registered?
+                    <a href="{{ url_for('login') }}">Login here</a>
+                </p>
+
+                <p class="auth-switch">
+                    <a href="{{ url_for('index') }}">← Back to home</a>
+                </p>
+            </section>
+        </div>
+
+    </section>
+
+    <footer class="site-footer">
+        <p>AgriSense — Smarter insights for healthier crops.</p>
+    </footer>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction History | AgriSense AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand-icon">🌿</span>
+        <span>AgriSense</span>
+    </a>
+
+    <nav class="navigation">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('profile') }}">Profile</a>
+
+        <form class="logout-form"
+              action="{{ url_for('logout') }}" method="POST">
+            <button class="nav-button" type="submit">Logout</button>
+        </form>
+    </nav>
+</header>
+
+<main class="page-container">
+
+    <section class="page-heading">
+        <p class="eyebrow">YOUR FARMING ACTIVITY</p>
+        <h1>Prediction History</h1>
+        <p>Review your previous disease screenings and crop yield estimates.</p>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <section class="history-stats">
+        <div class="stat-card">
+            <span class="stat-label">Total predictions</span>
+            <strong class="stat-number">{{ entries|length }}</strong>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Disease screenings</span>
+            <strong class="stat-number">
+                {{ entries|selectattr('prediction_type', 'equalto', 'disease')|list|length }}
+            </strong>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Yield estimates</span>
+            <strong class="stat-number">
+                {{ entries|selectattr('prediction_type', 'equalto', 'yield')|list|length }}
+            </strong>
+        </div>
+    </section>
+
+    {% if entries %}
+
+        <section class="history-list">
+            {% for entry in entries %}
+                <article class="history-item">
+
+                    <div class="history-icon" aria-hidden="true">
+                        {% if entry.prediction_type == 'disease' %}
+                            🍃
+                        {% else %}
+                            🌾
+                        {% endif %}
+                    </div>
+
+                    <div class="history-info">
+                        <span class="history-type">
+                            {{ entry.prediction_type }} prediction
+                        </span>
+
+                        <h3>{{ entry.summary }}</h3>
+
+                        <p>
+                            {{ entry.created_at|replace('T', ' ') }}
+                        </p>
+                    </div>
+
+                    {% if entry.confidence is not none %}
+                        <div class="history-confidence">
+                            {{ "%.2f"|format(entry.confidence|float) }}%
+                        </div>
+                    {% endif %}
+
+                </article>
+            {% endfor %}
+        </section>
+
+    {% else %}
+
+        <section class="empty-state">
+            <div class="empty-state-icon" aria-hidden="true">🌱</div>
+            <h2>Your farming journey starts here</h2>
+            <p>
+                You haven't saved any predictions yet.
+                Run a disease screening or yield estimate to see it here.
+            </p>
+            <a class="hero-button"
+               href="{{ url_for('index') }}#disease-tool">
+                Make Your First Prediction
+            </a>
+        </section>
+
+    {% endif %}
+
+    <footer class="site-footer">
+        <p>AgriSense — Smarter insights for healthier crops.</p>
+    </footer>
+
+</main>
+</body>
+</html>

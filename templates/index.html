@@ -1,0 +1,1018 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AgriSense - Smart Crop Health Monitoring</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f5f9f4;
+            color: #26352b;
+        }
+
+        /* NAVBAR */
+
+        nav {
+            width: 100%;
+            padding: 18px 7%;
+            background: #174d32;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            color: white;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 22px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #a9e6a0;
+        }
+
+        .logout-btn {
+            border: none;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .logout-btn:hover {
+            color: #a9e6a0;
+        }
+
+        /* HERO SECTION */
+
+        .hero {
+            min-height: 490px;
+            padding: 65px 8%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 45px;
+            background: linear-gradient(
+                120deg,
+                #e8f5e9,
+                #f7fbf4
+            );
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 43px;
+            line-height: 1.3;
+            color: #174d32;
+            margin-bottom: 20px;
+        }
+
+        .hero-content h1 span {
+            color: #4d9b51;
+        }
+
+        .hero-content p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #627267;
+            max-width: 570px;
+            margin-bottom: 28px;
+        }
+
+        .hero-button {
+            display: inline-block;
+            background: #287b45;
+            color: white;
+            text-decoration: none;
+            padding: 13px 27px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .hero-button:hover {
+            background: #174d32;
+            transform: translateY(-2px);
+        }
+
+        /* HERO IMAGE */
+
+        .hero-image {
+            width: 420px;
+            height: 320px;
+            border-radius: 22px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.13);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* GENERAL SECTION */
+
+        .section {
+            padding: 55px 8%;
+        }
+
+        .section-heading {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .section-heading h2 {
+            font-size: 30px;
+            color: #174d32;
+            margin-bottom: 10px;
+        }
+
+        .section-heading p {
+            color: #718076;
+            font-size: 14px;
+        }
+
+        /* UPLOAD SECTION */
+
+        .upload-card {
+            max-width: 750px;
+            margin: auto;
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 5px 22px rgba(0, 0, 0, 0.07);
+            text-align: center;
+        }
+
+        .upload-icon {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        .upload-card h3 {
+            color: #174d32;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .upload-card p {
+            color: #758278;
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px dashed #8bbd8b;
+            border-radius: 10px;
+            background: #f8fcf7;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .file-input:hover {
+            border-color: #287b45;
+        }
+
+        .preview-container {
+            display: none;
+            margin: 15px auto 20px;
+        }
+
+        .preview-container img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        .preview-name {
+            margin-top: 8px;
+            color: #68776c;
+            font-size: 13px;
+            word-break: break-word;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #287b45;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #174d32;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .upload-note {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #87948a;
+        }
+
+        /* ALERT MESSAGES */
+
+        .messages {
+            max-width: 750px;
+            margin: 20px auto;
+        }
+
+        .alert {
+            padding: 13px 17px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .alert.success {
+            background: #e4f5e6;
+            color: #226b37;
+        }
+
+        .alert.error {
+            background: #ffe8e8;
+            color: #a52c2c;
+        }
+
+        .alert.warning {
+            background: #fff4d8;
+            color: #856404;
+        }
+
+        /* RESULT SECTION */
+
+        .result-section {
+            max-width: 850px;
+            margin: 30px auto;
+        }
+
+        .result-card {
+            background: white;
+            padding: 28px;
+            border-radius: 15px;
+            margin-bottom: 22px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .result-card h2 {
+            color: #174d32;
+            margin-bottom: 20px;
+            font-size: 23px;
+        }
+
+        .result-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: #f5f8f4;
+            margin-bottom: 20px;
+        }
+
+        .result-detail {
+            padding: 12px 0;
+            border-bottom: 1px solid #edf1ec;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+
+        .result-detail:last-of-type {
+            border-bottom: none;
+        }
+
+        .result-detail strong {
+            color: #174d32;
+        }
+
+        .result-detail span {
+            color: #536257;
+            text-align: right;
+        }
+
+        .healthy-status {
+            color: #238342 !important;
+            font-weight: 700;
+        }
+
+        .disease-status {
+            color: #c34b35 !important;
+            font-weight: 700;
+        }
+
+        .result-note {
+            margin-top: 18px;
+            padding: 14px;
+            background: #f0f7ed;
+            border-left: 4px solid #5b9d55;
+            border-radius: 7px;
+            color: #526653;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* YIELD RESULT */
+
+        .yield-card {
+            background: linear-gradient(
+                135deg,
+                #174d32,
+                #39834c
+            );
+            color: white;
+        }
+
+        .yield-card h2 {
+            color: white;
+        }
+
+        .yield-number {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        .yield-unit {
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        .yield-card .result-detail {
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .yield-card .result-detail strong,
+        .yield-card .result-detail span {
+            color: white;
+        }
+
+        .yield-card .result-note {
+            background: rgba(255,255,255,0.12);
+            border-left-color: #b9e6a9;
+            color: white;
+        }
+
+        .yield-warning {
+            background: #fff4dc;
+            color: #795c22;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* FOOTER */
+
+        footer {
+            background: #174d32;
+            color: white;
+            padding: 28px 8%;
+            text-align: center;
+            margin-top: 45px;
+        }
+
+        footer p {
+            font-size: 13px;
+            color: #d4e7d7;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 900px) {
+
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 50px 6%;
+            }
+
+            .hero-content p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-image {
+                width: 100%;
+                max-width: 500px;
+                height: 300px;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            nav {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 18px 5%;
+            }
+
+            .nav-links {
+                gap: 14px;
+            }
+
+            .hero-content h1 {
+                font-size: 32px;
+            }
+
+            .hero-image {
+                height: 240px;
+            }
+
+            .section {
+                padding: 40px 5%;
+            }
+
+            .upload-card {
+                padding: 23px;
+            }
+
+            .result-card {
+                padding: 20px;
+            }
+
+            .yield-number {
+                font-size: 29px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav>
+
+        <div class="logo">
+            🌿 AgriSense
+        </div>
+
+        <div class="nav-links">
+
+            {% if current_user %}
+
+                <a href="{{ url_for('dashboard') }}">
+                    Dashboard
+                </a>
+
+                <a href="{{ url_for('index') }}">
+                    Home
+                </a>
+
+                <a href="{{ url_for('history') }}">
+                    History
+                </a>
+
+                <a href="{{ url_for('profile') }}">
+                    Profile
+                </a>
+
+                <form action="{{ url_for('logout') }}"
+                      method="POST"
+                      style="display:inline;">
+
+                    <button type="submit" class="logout-btn">
+                        Logout
+                    </button>
+
+                </form>
+
+            {% else %}
+
+                <a href="{{ url_for('index') }}">
+                    Home
+                </a>
+
+                <a href="{{ url_for('login') }}">
+                    Login
+                </a>
+
+                <a href="{{ url_for('register') }}">
+                    Register
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </nav>
+
+
+    <!-- HERO SECTION -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <h1>
+                Smart Farming Starts With
+                <span>AgriSense</span>
+            </h1>
+
+            <p>
+                Empowering agriculture with Artificial Intelligence.
+                Analyse crop leaf images, identify possible plant
+                diseases and receive automatic crop yield estimates
+                using our intelligent prediction system.
+            </p>
+
+            <a href="#analyse" class="hero-button">
+                Analyse Your Crop
+            </a>
+
+        </div>
+
+
+        <!-- REPLACED EMOJI WITH HERO IMAGE -->
+
+        <div class="hero-image">
+
+            <img
+                src="{{ url_for('static', filename='images/hero-plant.png') }}"
+                alt="AgriSense smart agriculture and healthy crop plants"
+            >
+
+        </div>
+
+    </section>
+
+
+    <!-- FLASH MESSAGES -->
+
+    <div class="messages">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% for category, message in messages %}
+
+                <div class="alert {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+        {% if disease_error %}
+
+            <div class="alert error">
+                {{ disease_error }}
+            </div>
+
+        {% endif %}
+
+        {% if yield_error %}
+
+            <div class="alert warning">
+                Yield prediction unavailable: {{ yield_error }}
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- IMAGE UPLOAD SECTION -->
+
+    <section class="section" id="analyse">
+
+        <div class="section-heading">
+
+            <h2>Crop Disease Detection</h2>
+
+            <p>
+                Upload a clear image of your crop leaf to analyse
+                its health using artificial intelligence.
+            </p>
+
+        </div>
+
+
+        <div class="upload-card">
+
+            <div class="upload-icon">
+                <span>📸</span>
+            </div>
+
+            <h3>Upload Your Leaf Image</h3>
+
+            <p>
+                Select a clear JPG, PNG or WEBP image of a plant leaf.
+            </p>
+
+
+            <form
+                id="predictionForm"
+                action="{{ url_for('predict_disease_route') }}"
+                method="POST"
+                enctype="multipart/form-data"
+            >
+
+                <input
+                    type="file"
+                    name="leaf_image"
+                    id="leaf_image"
+                    class="file-input"
+                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                    required
+                >
+
+
+                <!-- IMAGE PREVIEW -->
+
+                <div class="preview-container" id="previewContainer">
+
+                    <img
+                        src=""
+                        id="imagePreview"
+                        alt="Selected leaf image preview"
+                    >
+
+                    <div
+                        class="preview-name"
+                        id="previewName">
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="submit-btn"
+                    id="submitBtn"
+                >
+                    Analyse Leaf Image
+                </button>
+
+            </form>
+
+
+            <div class="upload-note">
+                Maximum upload size: 10 MB.
+                Upload a genuine crop leaf photograph.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- DISEASE PREDICTION RESULT -->
+
+    {% if disease_result %}
+
+    <section class="section result-section">
+
+        <div class="result-card">
+
+            <h2>🌿 Disease Detection Result</h2>
+
+
+            <img
+                src="{{ disease_result.image_data }}"
+                alt="Uploaded crop leaf"
+                class="result-image"
+            >
+
+
+            <div class="result-detail">
+
+                <strong>Crop Identified</strong>
+
+                <span>
+                    {{ disease_result.crop }}
+                </span>
+
+            </div>
+
+
+            <div class="result-detail">
+
+                <strong>Detected Condition</strong>
+
+                <span class="{% if disease_result.healthy %}healthy-status{% else %}disease-status{% endif %}">
+
+                    {{ disease_result.label }}
+
+                </span>
+
+            </div>
+
+
+            <div class="result-detail">
+
+                <strong>Prediction Confidence</strong>
+
+                <span>
+                    {{ disease_result.confidence }}%
+                </span>
+
+            </div>
+
+
+            <div class="result-detail">
+
+                <strong>Crop Health Status</strong>
+
+                <span class="{% if disease_result.healthy %}healthy-status{% else %}disease-status{% endif %}">
+
+                    {% if disease_result.healthy %}
+                        Healthy
+                    {% else %}
+                        Possible Disease Detected
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <div class="result-note">
+
+                {{ disease_result.note }}
+
+            </div>
+
+        </div>
+
+
+        <!-- AUTOMATIC YIELD RESULT -->
+
+        {% if yield_result %}
+
+        <div class="result-card yield-card">
+
+            <h2>🌾 Automatic Crop Yield Prediction</h2>
+
+            <p>
+                Estimated crop yield for
+                <strong>{{ yield_result.crop }}</strong>
+            </p>
+
+
+            <div class="yield-number">
+
+                {{ "%.3f"|format(yield_result.value) }}
+
+                <span class="yield-unit">
+                    {{ yield_result.unit }}
+                </span>
+
+            </div>
+
+
+            <div class="result-detail">
+
+                <strong>Crop</strong>
+
+                <span>
+                    {{ yield_result.crop }}
+                </span>
+
+            </div>
+
+
+            <div class="result-detail">
+
+                <strong>Prediction Type</strong>
+
+                <span>
+                    {{ yield_result.type }}
+                </span>
+
+            </div>
+
+
+            <div class="result-detail">
+
+                <strong>Original Model Output</strong>
+
+                <span>
+                    {{ yield_result.original_value }}
+                    {{ yield_result.original_unit }}
+                </span>
+
+            </div>
+
+
+            <div class="result-note">
+
+                {{ yield_result.accuracy_note }}
+
+                <br><br>
+
+                {{ yield_result.note }}
+
+            </div>
+
+        </div>
+
+        {% elif yield_error %}
+
+        <div class="result-card">
+
+            <h2>Yield Prediction</h2>
+
+            <div class="yield-warning">
+                Disease detection was completed, but automatic
+                yield prediction could not be completed.
+
+                {{ yield_error }}
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+    {% endif %}
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            © 2026 AgriSense | AI-Based Crop Disease Detection
+            and Automatic Yield Prediction
+        </p>
+
+    </footer>
+
+
+    <!-- IMAGE PREVIEW AND FORM VALIDATION -->
+
+    <script>
+
+        const imageInput = document.getElementById("leaf_image");
+
+        const previewContainer = document.getElementById(
+            "previewContainer"
+        );
+
+        const imagePreview = document.getElementById(
+            "imagePreview"
+        );
+
+        const previewName = document.getElementById(
+            "previewName"
+        );
+
+        const predictionForm = document.getElementById(
+            "predictionForm"
+        );
+
+        const submitBtn = document.getElementById(
+            "submitBtn"
+        );
+
+
+        // IMAGE PREVIEW
+
+        imageInput.addEventListener("change", function () {
+
+            const file = this.files[0];
+
+            if (!file) {
+
+                previewContainer.style.display = "none";
+
+                imagePreview.src = "";
+
+                return;
+            }
+
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+
+            if (!allowedTypes.includes(file.type)) {
+
+                alert(
+                    "Please upload a JPG, PNG or WEBP image."
+                );
+
+                this.value = "";
+
+                previewContainer.style.display = "none";
+
+                return;
+            }
+
+
+            const maximumSize = 10 * 1024 * 1024;
+
+            if (file.size > maximumSize) {
+
+                alert(
+                    "Image size must be less than 10 MB."
+                );
+
+                this.value = "";
+
+                previewContainer.style.display = "none";
+
+                return;
+            }
+
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+
+                imagePreview.src = event.target.result;
+
+                previewName.textContent = file.name;
+
+                previewContainer.style.display = "block";
+
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+
+
+        // FORM SUBMISSION
+
+        predictionForm.addEventListener("submit", function (event) {
+
+            if (!imageInput.files.length) {
+
+                event.preventDefault();
+
+                alert("Please select a leaf image.");
+
+                return;
+            }
+
+            submitBtn.disabled = true;
+
+            submitBtn.textContent = "Analysing Image...";
+
+        });
+
+
+    </script>
+
+</body>
+</html>

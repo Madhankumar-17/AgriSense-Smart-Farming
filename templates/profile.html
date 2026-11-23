@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | AgriSense AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand-icon">🌿</span>
+        <span>AgriSense</span>
+    </a>
+
+    <nav class="navigation">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('history') }}">History</a>
+
+        <form class="logout-form"
+              action="{{ url_for('logout') }}" method="POST">
+            <button class="nav-button" type="submit">Logout</button>
+        </form>
+    </nav>
+</header>
+
+<main class="page-container">
+
+    <section class="page-heading">
+        <p class="eyebrow">YOUR ACCOUNT</p>
+        <h1>My Profile</h1>
+        <p>Manage your AgriSense account and explore your activity.</p>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <section class="profile-layout">
+
+        <aside class="profile-summary">
+            <div class="avatar-circle">
+                {{ current_user.name[0]|upper }}
+            </div>
+
+            <h2>{{ current_user.name }}</h2>
+            <p>{{ current_user.email }}</p>
+
+            <span class="profile-role">🌱 AgriSense Member</span>
+        </aside>
+
+        <div class="profile-details">
+
+            <section class="panel-card">
+                <p class="eyebrow">ACCOUNT INFORMATION</p>
+                <h2>Personal details</h2>
+
+                <div class="profile-detail-row">
+                    <span class="profile-detail-label">Full name</span>
+                    <span class="profile-detail-value">
+                        {{ current_user.name }}
+                    </span>
+                </div>
+
+                <div class="profile-detail-row">
+                    <span class="profile-detail-label">Email address</span>
+                    <span class="profile-detail-value">
+                        {{ current_user.email }}
+                    </span>
+                </div>
+
+                <div class="profile-detail-row">
+                    <span class="profile-detail-label">Member since</span>
+                    <span class="profile-detail-value">
+                        {{ current_user.created_at[:10] }}
+                    </span>
+                </div>
+            </section>
+
+            <section class="panel-card">
+                <p class="eyebrow">YOUR ACTIVITY</p>
+                <h2>Prediction overview</h2>
+
+                <div class="profile-detail-row">
+                    <span class="profile-detail-label">
+                        Saved predictions
+                    </span>
+                    <span class="profile-detail-value">
+                        {{ prediction_count }}
+                    </span>
+                </div>
+
+                <div class="profile-action">
+                    <a class="hero-button"
+                       href="{{ url_for('history') }}">
+                        View Prediction History →
+                    </a>
+                </div>
+            </section>
+
+        </div>
+
+    </section>
+
+    <footer class="site-footer">
+        <p>AgriSense — Smarter insights for healthier crops.</p>
+    </footer>
+
+</main>
+</body>
+</html>

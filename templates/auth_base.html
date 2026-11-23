@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}AgriSense{% endblock %}</title>
+
+    <!-- Shared site theme and farmland background -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Login, registration and history styling -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='auth.css') }}">
+
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('index') }}">
+            <span class="brand-icon" aria-hidden="true">🌱</span>
+            <span>AgriSense</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+            <a class="nav-button" href="{{ url_for('index') }}">
+                Home
+            </a>
+
+            {% if session.get('user_id') %}
+                <a class="nav-button"
+                   href="{{ url_for('history') }}">
+                    History
+                </a>
+
+                <a class="nav-button nav-join"
+                   href="{{ url_for('logout') }}">
+                    Logout
+                </a>
+            {% else %}
+                <a class="nav-button"
+                   href="{{ url_for('login') }}">
+                    Login
+                </a>
+
+                <a class="nav-button nav-join"
+                   href="{{ url_for('register') }}">
+                    Register
+                </a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <!-- Flask flash notifications -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="auth-footer">
+        <p>🌱 AgriSense — Smarter Insights for Better Farming</p>
+        <p>AI-powered crop insights to support informed farming decisions.</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>
