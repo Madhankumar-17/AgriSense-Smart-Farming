@@ -619,9 +619,7 @@ def initialize_models():
 
     init_db()
     load_disease_model()
-    load_clip_validator()
     load_yield_model()
-
 
 # =========================================================
 # HOME PAGE RENDERING
@@ -666,10 +664,7 @@ def predict_disease(image_file):
             disease_model_error or "TFLite disease model is unavailable."
         )
 
-    if clip_model is None:
-        raise RuntimeError(
-            clip_error or "CLIP image validator is unavailable."
-        )
+    validate_leaf_image(display_image)
 
     try:
         image_file.stream.seek(0)
