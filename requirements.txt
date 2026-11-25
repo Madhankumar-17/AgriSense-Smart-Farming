@@ -6,3 +6,4 @@ Pillow>=10.0,<13.0
 scikit-learn>=1.4,<2.0
 torch>=2.0,<3.0
 transformers>=5.0,<6.0
+gunicorn
