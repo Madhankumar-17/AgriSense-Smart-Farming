@@ -4,4 +4,6 @@ __pycache__/
 .env
 *.db
 uploads/
+test_leaf.jpg
+test_tflite_model.py
 models/yield_model.pkl

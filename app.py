@@ -51,7 +51,7 @@ MODEL_DIR = BASE_DIR / "models"
 
 DB_PATH = BASE_DIR / "agrisense.db"
 
-DISEASE_MODEL_PATH = MODEL_DIR / "agrisense_disease_model.keras"
+DISEASE_MODEL_PATH = MODEL_DIR / "agrisense_disease_model_fp16.tflite"
 CLASS_NAMES_PATH = MODEL_DIR / "class_names.json"
 YIELD_MODEL_PATH = MODEL_DIR / "yield_model.pkl"
 
@@ -95,7 +95,9 @@ YIELD_FEATURES = YIELD_CATEGORICAL + YIELD_NUMERIC
 # MODEL VARIABLES
 # =========================================================
 
-disease_model = None
+disease_interpreter = None
+disease_input_details = None
+disease_output_details = None
 class_names = []
 
 yield_model = None
@@ -300,7 +302,8 @@ def record_prediction(
         get_db().commit()
 
     elif prediction_type == "disease":
-        # Count one guest prediction per uploaded image.
+        # Count one accepted uploaded leaf image as one guest prediction.
+        # Automatic yield output from the same image does not consume another slot.
         session["guest_predictions"] = (
             int(session.get("guest_predictions", 0)) + 1
         )
@@ -309,20 +312,22 @@ def record_prediction(
 
 
 # =========================================================
-# DISEASE MODEL LOADING
+# TENSORFLOW LITE DISEASE MODEL LOADING
 # =========================================================
 
 def load_disease_model():
-    """Load existing TensorFlow disease model."""
+    """Load the tested FP16 TensorFlow Lite disease model."""
 
-    global disease_model
+    global disease_interpreter
+    global disease_input_details
+    global disease_output_details
     global class_names
     global disease_model_error
 
     try:
         if not DISEASE_MODEL_PATH.is_file():
             raise FileNotFoundError(
-                f"Disease model not found: {DISEASE_MODEL_PATH}"
+                f"TFLite disease model not found: {DISEASE_MODEL_PATH}"
             )
 
         if not CLASS_NAMES_PATH.is_file():
@@ -330,11 +335,7 @@ def load_disease_model():
                 f"Class names file not found: {CLASS_NAMES_PATH}"
             )
 
-        model = tf.keras.models.load_model(
-            str(DISEASE_MODEL_PATH),
-            compile=False,
-        )
-
+        # Load the class names using the same order as model training.
         with CLASS_NAMES_PATH.open(
             "r",
             encoding="utf-8"
@@ -364,32 +365,58 @@ def load_disease_model():
         if not names:
             raise ValueError("No disease class names found.")
 
-        output_shape = model.output_shape
+        interpreter = tf.lite.Interpreter(
+            model_path=str(DISEASE_MODEL_PATH)
+        )
+        interpreter.allocate_tensors()
 
-        if isinstance(output_shape, list):
+        input_details = interpreter.get_input_details()
+        output_details = interpreter.get_output_details()
+
+        if len(input_details) != 1 or len(output_details) != 1:
             raise ValueError(
-                "Disease model must have one output."
+                "Disease TFLite model must have one input and one output."
+            )
+
+        input_shape = tuple(input_details[0]["shape"])
+        output_shape = tuple(output_details[0]["shape"])
+
+        if len(input_shape) != 4 or input_shape[1:] != (224, 224, 3):
+            raise ValueError(
+                f"Unexpected TFLite input shape: {input_shape}"
+            )
+
+        if len(output_shape) != 2:
+            raise ValueError(
+                f"Unexpected TFLite output shape: {output_shape}"
             )
 
         if output_shape[-1] != len(names):
             raise ValueError(
-                "Disease model output does not match class names."
+                "TFLite model output does not match class names."
             )
 
-        disease_model = model
+        disease_interpreter = interpreter
+        disease_input_details = input_details
+        disease_output_details = output_details
         class_names = [str(name) for name in names]
         disease_model_error = None
 
-        print("\nDISEASE MODEL LOADED")
-        print("Input:", model.input_shape)
-        print("Output:", model.output_shape)
+        print("\nTFLITE DISEASE MODEL LOADED SUCCESSFULLY")
+        print("Model:", DISEASE_MODEL_PATH.name)
+        print("Input:", input_shape)
+        print("Input dtype:", input_details[0]["dtype"])
+        print("Output:", output_shape)
+        print("Disease classes:", len(class_names))
 
     except Exception as exc:
-        disease_model = None
+        disease_interpreter = None
+        disease_input_details = None
+        disease_output_details = None
         class_names = []
         disease_model_error = str(exc)
 
-        app.logger.exception("Disease model loading failed")
+        app.logger.exception("TFLite disease model loading failed")
 
 
 # =========================================================
@@ -617,19 +644,26 @@ def render_home(
         yield_error=yield_error,
         auth_notice=auth_notice,
         last_disease_result=session.get("last_disease_result"),
+        disease_model_ready=(disease_interpreter is not None),
+        leaf_validator_ready=(
+            clip_model is not None and clip_processor is not None
+        ),
+        yield_model_ready=(yield_model is not None),
+        disease_model_error=disease_model_error,
+        yield_model_error=yield_model_error,
     )
 
 
 # =========================================================
-# DISEASE PREDICTION
+# DISEASE PREDICTION USING TENSORFLOW LITE
 # =========================================================
 
 def predict_disease(image_file):
-    """Validate leaf image and predict disease."""
+    """Validate leaf image and predict disease using TFLite."""
 
-    if disease_model is None:
+    if disease_interpreter is None:
         raise RuntimeError(
-            disease_model_error or "Disease model is unavailable."
+            disease_model_error or "TFLite disease model is unavailable."
         )
 
     if clip_model is None:
@@ -651,6 +685,7 @@ def predict_disease(image_file):
             display_image = original_image.convert("RGB")
             display_image.thumbnail((500, 500))
 
+        # Keep the existing CLIP leaf-image validation.
         validate_leaf_image(display_image)
 
         output_buffer = BytesIO()
@@ -683,15 +718,30 @@ def predict_disease(image_file):
             "Invalid image. Please upload JPG, PNG or WEBP."
         ) from exc
 
+    # Preserve the original preprocessing used by the Keras model.
     image_array = np.expand_dims(
         image_array / 255.0,
         axis=0
     )
 
+    input_detail = disease_input_details[0]
+    output_detail = disease_output_details[0]
+
+    # Match the input dtype required by the TFLite model.
+    image_array = image_array.astype(
+        input_detail["dtype"]
+    )
+
+    disease_interpreter.set_tensor(
+        input_detail["index"],
+        image_array
+    )
+
+    disease_interpreter.invoke()
+
     scores = np.asarray(
-        disease_model.predict(
-            image_array,
-            verbose=0
+        disease_interpreter.get_tensor(
+            output_detail["index"]
         )
     )
 
@@ -713,7 +763,6 @@ def predict_disease(image_file):
         )
 
     index = int(np.argmax(scores))
-
     raw_label = class_names[index]
 
     confidence = round(
@@ -1097,7 +1146,7 @@ def predict_disease_route():
             )
         )
 
-    if disease_model is None:
+    if disease_interpreter is None:
         return render_home(
             disease_error=(
                 "Disease model unavailable: "
@@ -1256,6 +1305,9 @@ def register():
             return render_template("register.html")
 
         try:
+            guest_predictions_before_auth = int(
+                session.get("guest_predictions", 0)
+            )
             db = get_db()
 
             cursor = db.execute(
@@ -1277,6 +1329,7 @@ def register():
             db.commit()
 
             session.clear()
+            session["guest_predictions"] = guest_predictions_before_auth
             session["user_id"] = cursor.lastrowid
 
             flash(
@@ -1329,7 +1382,11 @@ def login():
                 password
             )
         ):
+            guest_predictions_before_auth = int(
+                session.get("guest_predictions", 0)
+            )
             session.clear()
+            session["guest_predictions"] = guest_predictions_before_auth
             session["user_id"] = user["id"]
 
             flash("Welcome back!", "success")
@@ -1354,7 +1411,10 @@ def login():
 )
 def logout():
 
+    # Keep the guest allowance when a member logs out in the same browser.
+    guest_predictions = int(session.get("guest_predictions", 0))
     session.clear()
+    session["guest_predictions"] = guest_predictions
 
     flash("You have been logged out.", "success")
 
