@@ -7,3 +7,12 @@ uploads/
 test_leaf.jpg
 test_tflite_model.py
 models/yield_model.pkl
+
+.venv/
+__pycache__/
+*.pyc
+.env
+*.db
+uploads/
+models/*.pkl
+models/*.keras

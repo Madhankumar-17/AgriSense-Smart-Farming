@@ -3,6 +3,7 @@ import base64
 import json
 import os
 import pickle
+import joblib
 import sqlite3
 from datetime import datetime
 from io import BytesIO
@@ -53,7 +54,7 @@ DB_PATH = BASE_DIR / "agrisense.db"
 
 DISEASE_MODEL_PATH = MODEL_DIR / "agrisense_disease_model_fp16.tflite"
 CLASS_NAMES_PATH = MODEL_DIR / "class_names.json"
-YIELD_MODEL_PATH = MODEL_DIR / "yield_model.pkl"
+YIELD_MODEL_PATH = MODEL_DIR / "yield_model_20trees.joblib"
 
 IMAGE_SIZE = (224, 224)
 
@@ -573,8 +574,7 @@ def load_yield_model():
                 f"Yield model not found: {YIELD_MODEL_PATH}"
             )
 
-        with YIELD_MODEL_PATH.open("rb") as file:
-            loaded_model = pickle.load(file)
+        loaded_model = joblib.load(YIELD_MODEL_PATH)
 
         if not callable(
             getattr(loaded_model, "predict", None)
